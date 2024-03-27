@@ -15,6 +15,7 @@ b = rand(n,1);
 timeit(@() A\b,1)
 timeit(@() luWithPartialPivoting(A,b),1)
 
+
 % norm(x1-x2)
 % norm(x1-x3)
 

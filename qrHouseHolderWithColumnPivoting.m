@@ -1,4 +1,4 @@
-function x = qrWithColumnPivoting(A, b, tol)
+function x = qrHouseHolderWithColumnPivoting(A, b, tol)
   % Solve the least squares problem using QR factorization with pivoting
   % Input: A - Rectangular matrix with more rows than columns
   %        b - Column vector

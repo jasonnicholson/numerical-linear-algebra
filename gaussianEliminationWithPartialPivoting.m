@@ -1,11 +1,5 @@
 function x = gaussianEliminationWithPartialPivoting(A, b, tol)
     
-    arguments
-        A (:,:) single
-        b (:,:) single
-        tol (1,1) single = 1e-6;
-    end
-    
     % We could check inputs. However, I don't think this algorithm will be
     % used that genericly. Possible checks:
     % assert(size(A,1) == size(A,2), "A must be square);
@@ -41,10 +35,9 @@ function x = gaussianEliminationWithPartialPivoting(A, b, tol)
     end
     
     % Check for rank deficiency or near singularity
-    diagU = abs(diag(Ab)); % Get the absolute values of the diagonal of U
-    maxDiagU = max(diagU); % Find the largest value
+    diagU = abs(diag(Ab(1:n,1:n))); % Get the absolute values of the diagonal of U
     % Check for values less than tol
-    if any(diagU / maxDiagU < tol)
+    if any(diagU / max(diagU) < tol)
         warning('Matrix is close to singular or badly scaled. Results may be inaccurate.');
     end
 

@@ -7,27 +7,24 @@ clc; clear; close all;
 
 %% Simple single matrix test
 rng default;
-n = 1000;
+n = 1875;
 A = rand(n);
 % A = rand(n);
 b = rand(n,1);
 
-results = table;
-results.Algorithm = ["\";"LU with Partial Pivoting"; "LU with Rook Pivoting";"LU with Complete Pivoting"];
+Algorithms = ["\"; "luWithPartialPivoting"; "luWithRookPivoting"; "luWithCompletePivoting"; "gaussianEliminationWithPartialPivoting"];
+
+results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);
-results.Time(2) = timeit(@() luWithPartialPivoting(A,b),1);
-results.Time(3) = timeit(@() luWithRookPivoting(A,b),1);
-results.Time(4) = timeit(@() luWithCompletePivoting(A,b),1);
+x1 = A\b;
+results.NormDiff(1) = 0;
+for i=numel(Algorithms):-1:2
+    results.Time(i) = timeit(@() feval(Algorithms(i),A,b),1);
+    x = feval(Algorithms(i),A,b);
+    results.NormDiff(i) = norm(x1 - x);
+end
 
 display(results)
-x1 = A\b;
-x2 = luWithPartialPivoting(A,b);
-x3 = luWithRookPivoting(A,b);
-x4 = luWithCompletePivoting(A,b);
-
-norm(x1-x2)
-norm(x1-x3)
-norm(x1-x4)
 
 %% Complex test formed from SVD and spherical cordinates
 % https://en.wikipedia.org/wiki/Spherical_coordinate_system

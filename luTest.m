@@ -13,7 +13,8 @@ A = rand(n);
 b = rand(n,1);
 tol = 1e-13;
 
-Algorithms = ["\"; "luWithPartialPivoting"; "luWithRookPivoting"; "luWithCompletePivoting"; "gaussianEliminationWithPartialPivoting"; "qrHouseholder"; "qrHouseHolderWithColumnPivoting"];
+Algorithms = ["\"; "luWithPartialPivoting"; "luWithRookPivoting"; "luWithCompletePivoting"; "gaussianEliminationWithPartialPivoting"; ...
+  "qrHouseholder"; "qrHouseHolderWithColumnPivoting"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

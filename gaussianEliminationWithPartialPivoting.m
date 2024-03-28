@@ -1,10 +1,6 @@
 function x = gaussianEliminationWithPartialPivoting(A, b, tol)
     
-    % We could check inputs. However, I don't think this algorithm will be
-    % used that genericly. Possible checks:
-    % assert(size(A,1) == size(A,2), "A must be square);
-    % assert(size(A,1) == size(b,1), "b must have the number of rows as A")
-    % assert(numel(size(A)) == 2, "A must be a matrix")
+    % We could check inputs. However, I don't think this algorithm will be used that genericly. Possible checks:
 
     % Get the size of the matrix A and b vector
     n = size(A, 1);
@@ -12,8 +8,7 @@ function x = gaussianEliminationWithPartialPivoting(A, b, tol)
     nnb = n + nb;
     n1 = n+1;
 
-    % Combining A and b signifies most of the data needed in cache for
-    % processing
+    % Combining A and b signifies most of the data needed in cache for processing
     Ab = [A b];
 
     % Perform gaussian elimination with partial pivoting

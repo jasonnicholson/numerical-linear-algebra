@@ -1,5 +1,5 @@
-function x = qrWithColumnPivoting(A, b, tol)
-  % Solve the least squares problem using QR factorization with pivoting
+function x = qrHouseholder(A, b, tol)
+  % Solve the least squares problem using QR factorization via Householder reflection
   % Input: A - Rectangular matrix with more rows than columns
   %        b - Column vector
   %        tol - singularity tolerance similar the reciprocal condition number
@@ -19,18 +19,8 @@ function x = qrWithColumnPivoting(A, b, tol)
   % Combining A and b signifies most of the data needed in cache for processing
   Ab = [A b];
 
-  % Initialize permutation vector
-  p = 1:n;
-
   % Perform QR factorization with column pivoting via Householder reflection
   for k = 1:n
-    % Find the column with the largest norm
-    [~, maxIdx] = max(sum(Ab(k:m, k:n).^2));
-    maxIdx = maxIdx + k - 1;
-
-    % Swap columns k and maxIdx in Ab
-    Ab(:, [k, maxIdx]) = Ab(:, [maxIdx, k]);
-    p([k, maxIdx]) = p([maxIdx, k]);
 
     % Find the Householder reflection vector, v
     sigma = -sign(Ab(k,k))*norm(Ab(k:m,k));
@@ -61,7 +51,6 @@ function x = qrWithColumnPivoting(A, b, tol)
   end
   Ab(1,n1:nnb) = Ab(1,n1:nnb)/Ab(1,1);
 
-  % Remove the permutation and output
-  x = zeros(n,1);
-  x(p) = Ab(1:n,n1:nnb);
+  % Output
+  x = Ab(1:n,n1:nnb);
 end

@@ -8,7 +8,7 @@ A = rand(m,n);
 b = rand(m,1);
 tol = 1e-13;
 
-Algorithms = ["\"; "qrHouseholder"; "qrWithColumnPivoting"];
+Algorithms = ["\"; "qrHouseholder"; "qrHouseHolderWithColumnPivoting"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

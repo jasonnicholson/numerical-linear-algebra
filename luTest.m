@@ -20,14 +20,13 @@ Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminatio
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);
 x1 = A\b;
-results.NormDiff(1) = 0;
-results.Ax_bNorm(1) = norm(A*x1 - b);
+results.AxMinusbNorm(1) = norm(A*x1 - b);
 for i=numel(Algorithms):-1:2
     results.Time(i) = timeit(@() feval(Algorithms(i),A,b,tol),1);
     x = feval(Algorithms(i),A,b,tol);
-    results.NormDiff(i) = norm(x1 - x);
-    results.Ax_bNorm(i) = norm(A*x - b);
+    results.AxMinusbNorm(i) = norm(A*x - b);
 end
+results.TimeRelative = results.Time./results.Time(results.Algorithms=="gaussianEliminationWithPartialPivoting");
 
 display(results)
 

@@ -59,5 +59,5 @@ function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
 
   % Remove the permutation and output
   x = zeros(n,1);
-  x(Ab(1:n,m+1)) = Ab(1:n,n1:nnb);
+  x(Ab(m+1,1:n)) = Ab(1:n,n1:nnb);
 end

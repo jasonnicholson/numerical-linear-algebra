@@ -1,36 +1,21 @@
-function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
-  % Solve the least squares problem using QR factorization with pivoting
-  % Input: A - Rectangular matrix with more rows than columns
-  %        b - Column vector
-  %        tol - singularity tolerance similar the reciprocal condition number
-  % Output: x - Solution to the least squares problem
+function x = qrHouseHolderWithPartialPivoting(A, b, tol)
 
   [m, n] = size(A);
   n1 = n + 1;
   nb = size(b,2);
   nnb = n + nb;
 
-  % We could do input checking but this function is not that general
-  % purpose.
-  %
-  % assert(m >= n, "Matrix A must have more rows than columns.");
-  % assert(m == size(b,1), "A must have the same number of rows as b.");
-
   % Combining A and b signifies most of the data needed in cache for processing
   Ab = [A b];
 
-  % Initialize permutation vector
-  p = 1:n;
-
-  % Perform QR factorization with column pivoting via Householder reflection
+  % Perform QR factorization with partial pivoting via Householder reflection
   for k = 1:n
-    % Find the column with the largest norm
-    [~, maxIdx] = max(sum(Ab(k:m, k:n).^2));
-    maxIdx = maxIdx + k - 1;
+    % Find the pivot index
+    [~, j] = max(abs(Ab(k:n, k)));
+    j = j + k - 1;
 
-    % Swap columns k and maxIdx in Ab
-    Ab(:, [k, maxIdx]) = Ab(:, [maxIdx, k]);
-    p([k, maxIdx]) = p([maxIdx, k]);
+    % Swap the k-th and j-th rows in A
+    Ab([k j], :) = Ab([j k], :);
 
     % Find the Householder reflection vector, v
     sigma = -sign(Ab(k,k))*norm(Ab(k:m,k));
@@ -61,7 +46,6 @@ function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
   end
   Ab(1,n1:nnb) = Ab(1,n1:nnb)/Ab(1,1);
 
-  % Remove the permutation and output
-  x = zeros(n,1);
-  x(p) = Ab(1:n,n1:nnb);
+  % Output
+  x = Ab(1:n,n1:nnb);
 end

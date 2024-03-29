@@ -1,6 +1,6 @@
 function x = gaussianEliminationWithPartialPivoting(A, b, tol)
     
-    % We could check inputs. However, I don't think this algorithm will be used that genericly. Possible checks:
+    % We could check inputs. However, I don't think this algorithm will be used that genericly.
 
     % Get the size of the matrix A and b vector
     n = size(A, 1);
@@ -17,7 +17,7 @@ function x = gaussianEliminationWithPartialPivoting(A, b, tol)
         [~, j] = max(abs(Ab(k:n, k)));
         j = j + k - 1;
         
-        % Swap the k-th and m-th rows in A and permutation vector p
+        % Swap the k-th and j-th rows in Ab
         Ab([k j], :) = Ab([j k], :);
         
         % Perform the gaussian elimination

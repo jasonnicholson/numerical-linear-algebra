@@ -16,11 +16,8 @@ function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
   % assert(m >= n, "Matrix A must have more rows than columns.");
   % assert(m == size(b,1), "A must have the same number of rows as b.");
 
-  % Combining A and b signifies most of the data needed in cache for processing
-  Ab = [A b];
-
-  % Initialize permutation vector
-  p = 1:n;
+  % Combining A, b, and column permutation signifies most of the data needed in cache for processing
+  Ab = [A b;1:n zeros(1,nb)];
 
   % Perform QR factorization with column pivoting via Householder reflection
   for k = 1:n
@@ -30,7 +27,6 @@ function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
 
     % Swap columns k and maxIdx in Ab
     Ab(:, [k, maxIdx]) = Ab(:, [maxIdx, k]);
-    p([k, maxIdx]) = p([maxIdx, k]);
 
     % Find the Householder reflection vector, v
     sigma = -sign(Ab(k,k))*norm(Ab(k:m,k));
@@ -63,5 +59,5 @@ function x = qrHouseHolderWithColumnNormPivoting(A, b, tol)
 
   % Remove the permutation and output
   x = zeros(n,1);
-  x(p) = Ab(1:n,n1:nnb);
+  x(Ab(1:n,m+1)) = Ab(1:n,n1:nnb);
 end

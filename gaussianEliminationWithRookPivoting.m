@@ -9,7 +9,7 @@ function x = gaussianEliminationWithRookPivoting(A, b, tol)
   n1 = n+1;
 
   % Combining A, b, and column pivot. This is most of the data needed in cache for processing
-  Ab = [A b; 1:n 0];
+  Ab = [A b; 1:n zeros(1,nb)];
 
   % Perform gaussian elimination with partial pivoting
   for k = 1:n-1

@@ -33,10 +33,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     tol = mxGetDoubles(prhs[2]);
 
     // Get the size of the matrix A and b vector
-    n = mxGetM(prhs[0]);
-    nb = mxGetN(prhs[1]);
+    n = mxGetM(A);
+    nb = mxGetN(b);
     nnb = n + nb;
     n1 = n + 1;
+
+    // Check that A and b are compatible
+    if (mxGetN(A) != n) {
+        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
+                          "Matrix A must be square.");
+    }
+    if (mxGetM(b) != n) {
+        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
+                          "Matrix A and vector b must have the same number of rows.");
+    }
 
     // Combining A and b signifies most of the data needed in cache for processing
     Ab_mxArray = mxCreateDoubleMatrix(n, nnb, mxREAL);

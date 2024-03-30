@@ -9,7 +9,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mwIndex i, j, k;
     mxArray *Ab_mxArray;
 
-    /* Check for proper number of input and output arguments */
+    // Check for proper number of input and output arguments
     if (nrhs != 3) {
         mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidNumInputs",
                           "Three input arguments required.");
@@ -19,7 +19,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                           "Too many output arguments.");
     }
 
-    /* Check input argument types */
+    // Check input argument types
     if (!mxIsDouble(prhs[0]) || 
         !mxIsDouble(prhs[1]) || 
         !mxIsDouble(prhs[2])) {
@@ -32,13 +32,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     b = mxGetDoubles(prhs[1]);
     tol = mxGetDoubles(prhs[2]);
 
-    /* Get the size of the matrix A and b vector */
+    // Get the size of the matrix A and b vector
     n = mxGetM(prhs[0]);
     nb = mxGetN(prhs[1]);
     nnb = n + nb;
     n1 = n + 1;
 
-    /* Combining A and b signifies most of the data needed in cache for processing */
+    // Combining A and b signifies most of the data needed in cache for processing
     Ab_mxArray = mxCreateDoubleMatrix(n, nnb, mxREAL);
     Ab = mxGetDoubles(Ab_mxArray);
     for (i = 0; i < n; i++) {
@@ -50,9 +50,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
     }
 
-    /* Perform gaussian elimination with partial pivoting */
+    // Perform gaussian elimination with partial pivoting
     for (k = 0; k < n-1; k++) {
-        /* Find the pivot index */
+        //Find the pivot index by looking down the column
         j = k;
         for (i = k+1; i < n; i++) {
             if (fabs(Ab[i + k*n]) > fabs(Ab[j + k*n])) {
@@ -60,28 +60,28 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             }
         }
 
-        /* Swap the k-th and j-th rows in Ab */
+        // Swap the k-th and j-th rows in Ab
         for (i = 0; i < nnb; i++) {
             double temp = Ab[k + i*n];
             Ab[k + i*n] = Ab[j + i*n];
             Ab[j + i*n] = temp;
         }
 
-        /* Perform the gaussian elimination */
+        // Perform the gaussian elimination
         if (Ab[k + k*n] == 0) {
             mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular",
                               "Matrix is singular.");
         } else {
             for (i = k+1; i < n; i++) {
-                double lVector = Ab[i + k*n] / Ab[k + k*n]; /* Calculate lower triangular part */
+                double lVector = Ab[i + k*n] / Ab[k + k*n]; // Calculate lower triangular part
                 for (j = k+1; j < nnb; j++) {
-                    Ab[i + j*n] -= lVector * Ab[k + j*n]; /* Calculate upper triangular part */
+                    Ab[i + j*n] -= lVector * Ab[k + j*n]; // Calculate upper triangular part
                 }
             }
         }
     }
 
-    /* Check for rank deficiency or near singularity */
+    // Check for rank deficiency or near singularity
     double maxDiag = 0.0;
     for (i = 0; i < n; i++) {
         double currentDiag = fabs(Ab[i + i*n]);
@@ -97,7 +97,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
     }
 
-    /* Backward substitution to solve Ux = y */
+    // Backward substitution to solve Ux = y
     plhs[0] = mxCreateDoubleMatrix(n, nb, mxREAL);
     x = mxGetDoubles(plhs[0]);
     for (i = n; i-- > 0;) {
@@ -111,6 +111,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
     }
 
-    /* Clean up */
+    // Clean up
     mxDestroyArray(Ab_mxArray);
 }

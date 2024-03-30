@@ -1,8 +1,10 @@
+// Must be compiled with "mex -R2018a ..." 
+
 #include "mex.h"
 #include <math.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-    double *A, *b, *x, *Ab, tol = 1e-5;
+    double *A, *b, *x, *Ab, *tol;
     size_t n, nb, nnb, n1;
     mwIndex i, j, k;
     mxArray *Ab_mxArray;
@@ -25,6 +27,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                           "Input arguments must be real double.");
     }
 
+    // Get the inputs
+    A = mxGetDoubles(prhs[0]);
+    b = mxGetDoubles(prhs[1]);
+    tol = mxGetDoubles(prhs[2]);
+
     /* Get the size of the matrix A and b vector */
     n = mxGetM(prhs[0]);
     nb = mxGetN(prhs[1]);
@@ -33,9 +40,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     /* Combining A and b signifies most of the data needed in cache for processing */
     Ab_mxArray = mxCreateDoubleMatrix(n, nnb, mxREAL);
-    Ab = mxGetPr(Ab_mxArray);
-    A = mxGetPr(prhs[0]);
-    b = mxGetPr(prhs[1]);
+    Ab = mxGetDoubles(Ab_mxArray);
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             Ab[i + j*n] = A[i + j*n];
@@ -78,7 +83,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     /* Check for rank deficiency or near singularity */
     for (i = 0; i < n; i++) {
-        if (fabs(Ab[i + i*n]) < tol) {
+        if (fabs(Ab[i + i*n]) < *tol) {
             mexWarnMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsCloseToSingular",
                                "Matrix is close to singular or badly scaled. Results may be inaccurate.");
             break;
@@ -87,7 +92,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     /* Backward substitution to solve Ux = y */
     plhs[0] = mxCreateDoubleMatrix(n, nb, mxREAL);
-    x = mxGetPr(plhs[0]);
+    x = mxGetDoubles(plhs[0]);
     for (i = n; i-- > 0;) {
         for (j = 0; j < nb; j++) {
             x[i + j*n] = Ab[i + (j+n)*n] / Ab[i + i*n];

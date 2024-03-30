@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "(gdb) Attach",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "/usr/local/MATLAB/R2024a/bin/glnxa64/MATLAB",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "handle SIGSEGV nostop"
+                },
+                {
+                    "text": "handle SIGSEGV noprint"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/MATLAB/R2024a/extern/include/**"
+            ],
+            "defines": [
+                "-DMX_COMPAT_64",
+                "-DMATLAB_MEXCMD_RELEASE=R2018a",
+                "-DUSE_MEX_CMD",
+                "-D_GNU_SOURCE",
+                "-DMATLAB_MEX_FILE"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": [
+                "-fexceptions",
+                "-fPIC",
+                "-fno-omit-frame-pointer",
+                "-pthread",
+                "-fwrapv"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "compilerPath": "/usr/bin/gcc"
+        }
+    ],
+    "version": 4
+}

@@ -4,8 +4,8 @@
 #include <math.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-    double *A, *b, *x, *Ab, *tol;
-    size_t n, nb, nnb, n1;
+    mxDouble *A, *b, *x, *Ab, *tol;
+    ptrdiff_t n, nb, nnb, n1;
     mwIndex i, j, k;
     mxArray *Ab_mxArray;
 
@@ -82,8 +82,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
     /* Check for rank deficiency or near singularity */
+    double maxDiag = 0.0;
     for (i = 0; i < n; i++) {
-        if (fabs(Ab[i + i*n]) < *tol) {
+        double currentDiag = fabs(Ab[i + i*n]);
+        if ( currentDiag > maxDiag) {
+            maxDiag = currentDiag;
+        }
+    }
+    for (i = 0; i < n; i++) {
+        if (fabs(Ab[i + i*n])/maxDiag < *tol) {
             mexWarnMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsCloseToSingular",
                                "Matrix is close to singular or badly scaled. Results may be inaccurate.");
             break;

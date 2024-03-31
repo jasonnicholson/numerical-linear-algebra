@@ -1,4 +1,4 @@
-clc; clear; close all;
+clear; close all;
 
 % Notes
 % https://nhigham.com/2021/04/20/what-is-an-lu-factorization/
@@ -13,9 +13,10 @@ A = rand(n);
 b = rand(n,1);
 tol = 1e-13;
 
-Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithRookPivoting"; ...
-  "gaussianEliminationWithCompletePivoting"; "qrHouseholder"; "qrHouseHolderWithColumnNormPivoting"; "qrHouseHolderWithPartialPivoting";
-  "gaussianElimination"; "gaussianEliminationWithPartialPivotingC"];
+% Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithRookPivoting"; ...
+%   "gaussianEliminationWithCompletePivoting"; "qrHouseholder"; "qrHouseHolderWithColumnNormPivoting"; "qrHouseHolderWithPartialPivoting";
+%   "gaussianElimination"; "gaussianEliminationWithPartialPivotingC"];
+Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithPartialPivotingC"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

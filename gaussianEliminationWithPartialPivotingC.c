@@ -2,12 +2,19 @@
 
 #include "mex.h"
 #include <math.h>
+#include "blas.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mxDouble *A, *b, *x, *Ab, *tol;
-    ptrdiff_t n, nb, nnb, n1;
+    mwSize nb, nnb;
     mwIndex i, j, k;
+    mwSignedIndex n;
     mxArray *Ab_mxArray;
+
+  // Get the size of the matrix A and b vector
+    n = mxGetM(prhs[0]);
+    nb = mxGetN(prhs[1]);
+    nnb = n + nb;
 
     // Check for proper number of input and output arguments
     if (nrhs != 3) {
@@ -18,7 +25,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:maxlhs",
                           "Too many output arguments.");
     }
-
     // Check input argument types
     if (!mxIsDouble(prhs[0]) || 
         !mxIsDouble(prhs[1]) || 
@@ -26,27 +32,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:inputNotRealScalarDouble",
                           "Input arguments must be real double.");
     }
+    // Check that A and b are compatible
+    if (mxGetN(prhs[0]) != n) {
+        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
+                          "Matrix A must be square.");
+    }
+    if (mxGetM(prhs[1]) != n) {
+        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
+                          "Matrix A and vector b must have the same number of rows.");
+    }
 
     // Get the inputs
     A = mxGetDoubles(prhs[0]);
     b = mxGetDoubles(prhs[1]);
     tol = mxGetDoubles(prhs[2]);
-
-    // Get the size of the matrix A and b vector
-    n = mxGetM(A);
-    nb = mxGetN(b);
-    nnb = n + nb;
-    n1 = n + 1;
-
-    // Check that A and b are compatible
-    if (mxGetN(A) != n) {
-        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
-                          "Matrix A must be square.");
-    }
-    if (mxGetM(b) != n) {
-        mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:invalidInput",
-                          "Matrix A and vector b must have the same number of rows.");
-    }
 
     // Combining A and b signifies most of the data needed in cache for processing
     Ab_mxArray = mxCreateDoubleMatrix(n, nnb, mxREAL);
@@ -60,15 +59,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
     }
 
+    
     // Perform gaussian elimination with partial pivoting
     for (k = 0; k < n-1; k++) {
         //Find the pivot index by looking down the column
-        j = k;
-        for (i = k+1; i < n; i++) {
-            if (fabs(Ab[i + k*n]) > fabs(Ab[j + k*n])) {
-                j = i;
-            }
-        }
+        ptrdiff_t increment = 1; // defines how big of step to take through the vector.
+        // Call BLAS function idamax_ . idamax_ returns 1-based indexing.
+        ptrdiff_t nn = (ptrdiff_t)(n-k);
+        j = idamax_(&nn, Ab + k*n + k, &increment) - 1 + k; // Subtract 1 to get 0-based indexing
 
         // Swap the k-th and j-th rows in Ab
         for (i = 0; i < nnb; i++) {

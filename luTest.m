@@ -15,7 +15,7 @@ tol = 1e-13;
 
 Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithRookPivoting"; ...
   "gaussianEliminationWithCompletePivoting"; "qrHouseholder"; "qrHouseHolderWithColumnNormPivoting"; "qrHouseHolderWithPartialPivoting";
-  "gaussianElimination"];
+  "gaussianElimination"; "gaussianEliminationWithPartialPivotingC"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

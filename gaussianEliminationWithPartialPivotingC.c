@@ -68,8 +68,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
         // Perform the gaussian elimination
         if (Ab[k + k*n] == 0) {
-            mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular",
-                              "Matrix is singular.");
+            mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular", "Matrix is singular.");
         } else {
             for (i = k+1; i < n; i++) {
                 double lVector = Ab[i + k*n] / Ab[k + k*n]; // Calculate lower triangular part
@@ -81,17 +80,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
     // Check for rank deficiency or near singularity
-    double maxDiag = 0.0;
-    for (i = 0; i < n; i++) {
-        double currentDiag = fabs(Ab[i + i*n]);
-        if ( currentDiag > maxDiag) {
-            maxDiag = currentDiag;
-        }
-    }
+    mwSignedIndex maxDiagIndex = idamax_(&n, Ab, &n) - 1; // find the maximum diagonal element
+    mxDouble maxDiag = fabs(Ab[maxDiagIndex]);
     for (i = 0; i < n; i++) {
         if (fabs(Ab[i + i*n])/maxDiag < *tol) {
-            mexWarnMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsCloseToSingular",
-                               "Matrix is close to singular or badly scaled. Results may be inaccurate.");
+            mexWarnMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsCloseToSingular", "Matrix is close to singular or badly scaled. Results may be inaccurate.");
             break;
         }
     }

@@ -1,8 +1,9 @@
-// Must be compiled with "mex -R2018a ..." 
+// Must be compiled with "mex -R2018a -lmwblas ..." 
 
 #include "mex.h"
 #include <math.h>
 #include "blas.h"
+#include <string.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mxDouble *A, *b, *x, *Ab, *tol;
@@ -50,15 +51,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Combining A and b signifies most of the data needed in cache for processing
     Ab_mxArray = mxCreateDoubleMatrix(n, nnb, mxREAL);
     Ab = mxGetDoubles(Ab_mxArray);
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            Ab[i + j*n] = A[i + j*n];
-        }
-        for (j = 0; j < nb; j++) {
-            Ab[i + (j+n)*n] = b[i + j*n];
-        }
-    }
-
+    memcpy(Ab, A, n*n*sizeof(mxDouble));
+    memcpy(Ab + n*n, b, n*nb*sizeof(mxDouble));
     
     // Perform gaussian elimination with partial pivoting
     for (k = 0; k < n-1; k++) {
@@ -69,11 +63,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         j = idamax_(&nn, Ab + k*n + k, &increment) - 1 + k; // Subtract 1 to get 0-based indexing
 
         // Swap the k-th and j-th rows in Ab
-        for (i = 0; i < nnb; i++) {
-            double temp = Ab[k + i*n];
-            Ab[k + i*n] = Ab[j + i*n];
-            Ab[j + i*n] = temp;
-        }
+        // Use dswap_ routine from BLAS
+        dswap_(&nnb, Ab + j, &n, Ab + k, &n);
 
         // Perform the gaussian elimination
         if (Ab[k + k*n] == 0) {

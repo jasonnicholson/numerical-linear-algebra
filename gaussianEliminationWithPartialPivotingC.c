@@ -48,28 +48,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     memcpy(Ab + nRowsA*nRowsA, b, nRowsA*nColumnsb*sizeof(mxDouble));
     
     // Perform gaussian elimination with partial pivoting
+    mwSignedIndex ROW_INCREMENT = 1; // defines how big of step to take through the column vector.
+    mwSignedIndex COLUMN_INCREMENT = nRowsA; // defines how big of step to take through the row vector.
+    mxDouble alpha = -1.0; // defines the scalar alpha in the dger_ routine.
+    mwSignedIndex leadingDimensionOfAb = nRowsA; // defines the leading dimension of the matrix Ab.
     for (mwIndex kColumn = 0; kColumn < nColumnsA-1; kColumn++) {
         mwIndex kRow = kColumn;
         //Find the pivot index by looking down the column
-        mwSignedIndex increment = 1; // defines how big of step to take through the vector.
         // Call BLAS function idamax_ . idamax_ returns 1-based indexing.
         mwSignedIndex nRowsInKcolumn = nRowsA - (mwSignedIndex)kRow;
-        mwSignedIndex jRow = idamax_(&nRowsInKcolumn, Ab + kColumn*nRowsA + kRow, &increment) - 1 + kRow; // Subtract 1 to get 0-based indexing
+        mwSignedIndex jRow = idamax_(&nRowsInKcolumn, Ab + kColumn*nRowsA + kRow, &ROW_INCREMENT) - 1 + kRow; // Subtract 1 to get 0-based indexing
 
         // Swap the k-th and j-th rows in Ab
         // Use dswap_ routine from BLAS
-        dswap_(&nColumnsAandb, Ab + jRow, &nRowsA, Ab + kColumn, &nRowsA);
+        dswap_(&nColumnsAandb, Ab + jRow, &nRowsA, Ab + kRow, &nRowsA);
 
         // Perform the gaussian elimination
         if (Ab[kRow + kColumn*nRowsA] == 0) {
             mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular", "Matrix is singular.");
         } else {
-            for (mwIndex iRow = kRow+1; iRow < nRowsA; iRow++) {
-                Ab[iRow + kColumn*nRowsA] = Ab[iRow + kColumn*nRowsA] / Ab[kRow + kColumn*nRowsA]; // Calculate lower triangular part
-                for (mwIndex jColumn = kColumn+1; jColumn < nColumnsAandb; jColumn++) {
-                    Ab[iRow + jColumn*nRowsA] -= Ab[iRow + kColumn*nRowsA] * Ab[kRow + jColumn*nRowsA]; // Calculate upper triangular part
-                }
-            }
+            // Calculate lower triangular part. This calculates column of L matrix at the kth column.
+            // Use dscal_ routine from BLAS
+            mwSignedIndex nRowsInKcolumnMinus1 = nRowsInKcolumn - 1;
+            mxDouble pivotInverse = 1.0/Ab[kRow + kColumn*nRowsA];
+            mxDouble *lVector = Ab + (kRow + 1) + kColumn*nRowsA;
+            dscal_(&nRowsInKcolumnMinus1, &pivotInverse, lVector, &ROW_INCREMENT);
+
+            // Calculate upper triangular part. This calculates the entire submatrix of U matrix at the current kth step.
+            // Use dger_ routine from BLAS
+            mwSignedIndex nRowsInSubMatrix = nRowsInKcolumnMinus1;
+            mwSignedIndex nColumnsInSubMatrix = nColumnsAandb - (kColumn + 1);
+            mxDouble *uRowVector = Ab + kRow  + (kColumn+1) * nRowsA;
+            mxDouble *uSubMatrix = Ab + (kRow + 1) + (kColumn+1) * nRowsA;
+            dger_(&nRowsInSubMatrix, &nColumnsInSubMatrix, &alpha, lVector, &ROW_INCREMENT, uRowVector, &COLUMN_INCREMENT, uSubMatrix, &leadingDimensionOfAb);
         }
     }
 

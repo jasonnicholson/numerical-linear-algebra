@@ -41,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mxDouble *b = mxGetDoubles(prhs[1]);
     mxDouble tol = mxGetScalar(prhs[2]);
 
-    // Combining A and b. This the main data needed in cache for the algorithm.
+    // Combining A and b. This aggregates the data needed in cache for the algorithm.
     mxArray *Ab_mxArray = mxCreateDoubleMatrix(nRowsA, nColumnsAandb, mxREAL);
     mxDouble *Ab = mxGetDoubles(Ab_mxArray);
     memcpy(Ab, A, nRowsA*nRowsA*sizeof(mxDouble));
@@ -50,7 +50,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Perform gaussian elimination with partial pivoting
     mwSignedIndex ROW_INCREMENT = 1; // defines how big of step to take through the column vector.
     mwSignedIndex COLUMN_INCREMENT = nRowsA; // defines how big of step to take through the row vector.
-    mxDouble alpha = -1.0; // defines the scalar alpha in the dger_ routine.
     mwSignedIndex leadingDimensionOfAb = nRowsA; // defines the leading dimension of the matrix Ab.
     for (mwIndex kColumn = 0; kColumn < nColumnsA-1; kColumn++) {
         mwIndex kRow = kColumn;
@@ -67,17 +66,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if (Ab[kRow + kColumn*nRowsA] == 0) {
             mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular", "Matrix is singular.");
         } else {
-            // Calculate lower triangular part. This calculates column of L matrix at the kth column.
+            // Calculate lower triangular part. This calculates the column of L matrix at the kth column.
             // Use dscal_ routine from BLAS
             mwSignedIndex nRowsInKcolumnMinus1 = nRowsInKcolumn - 1;
             mxDouble pivotInverse = 1.0/Ab[kRow + kColumn*nRowsA];
             mxDouble *lVector = Ab + (kRow + 1) + kColumn*nRowsA;
             dscal_(&nRowsInKcolumnMinus1, &pivotInverse, lVector, &ROW_INCREMENT);
 
-            // Calculate upper triangular part. This calculates the entire submatrix of U matrix at the current kth step.
+            // Calculate upper triangular part. This calculates the entire submatrix of the augemented U matrix at the current kth step.
+            // This handles Ly = b part of the algorithm as well.
             // Use dger_ routine from BLAS
             mwSignedIndex nRowsInSubMatrix = nRowsInKcolumnMinus1;
             mwSignedIndex nColumnsInSubMatrix = nColumnsAandb - (kColumn + 1);
+            mxDouble alpha = -1.0; // defines the scalar alpha in the dger_ routine.
             mxDouble *uRowVector = Ab + kRow  + (kColumn+1) * nRowsA;
             mxDouble *uSubMatrix = Ab + (kRow + 1) + (kColumn+1) * nRowsA;
             dger_(&nRowsInSubMatrix, &nColumnsInSubMatrix, &alpha, lVector, &ROW_INCREMENT, uRowVector, &COLUMN_INCREMENT, uSubMatrix, &leadingDimensionOfAb);
@@ -97,19 +98,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
     // Backward substitution to solve Ux = y
+    // use dtrsm_ routine from BLAS
+    char side = 'L', uplo = 'U', transa = 'N', diag = 'N';
+    mxDouble alpha = 1.0;
+    mwSignedIndex leadingDimensionOfb = nRowsA;
+    dtrsm_(&side, &uplo, &transa, &diag, &nRowsA, &nColumnsb, &alpha, Ab, &leadingDimensionOfAb, Ab + nRowsA * nColumnsA, &leadingDimensionOfb);
+
+    // Copy the solution to the output
     plhs[0] = mxCreateDoubleMatrix(nRowsA, nColumnsb, mxREAL);
     mxDouble *x = mxGetDoubles(plhs[0]);
-    for (mwIndex iRow = nRowsA; iRow-- > 0;) {
-        mwIndex iColumn = iRow;
-        for (mwIndex jColumnb = 0; jColumnb < nColumnsb; jColumnb++) {
-            x[iRow + jColumnb*nRowsA] = Ab[iRow + (jColumnb+nColumnsA)*nRowsA] / Ab[iRow + iColumn*nRowsA];
-        }
-        for (mwIndex jRow = 0; jRow < iRow; jRow++) {
-            for (mwIndex kColumnb = 0; kColumnb < nColumnsb; kColumnb++) {
-                Ab[jRow + (kColumnb+nColumnsA)*nRowsA] -= Ab[jRow + iColumn*nRowsA] * x[iRow + kColumnb*nRowsA];
-            }
-        }
-    }
+    memcpy(x, Ab + nRowsA * nColumnsA, nRowsA * nColumnsb * sizeof(mxDouble));
 
     // Clean up
     mxDestroyArray(Ab_mxArray);

@@ -7,7 +7,7 @@ clear; close all;
 
 %% Simple single matrix test
 rng default;
-n = 1875;
+n = 800;
 A = rand(n);
 % A = rand(n);
 b = rand(n,1);
@@ -16,7 +16,7 @@ tol = 1e-13;
 % Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithRookPivoting"; ...
 %   "gaussianEliminationWithCompletePivoting"; "qrHouseholder"; "qrHouseHolderWithColumnNormPivoting"; "qrHouseHolderWithPartialPivoting";
 %   "gaussianElimination"; "gaussianEliminationWithPartialPivotingC"];
-Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithPartialPivotingCblas"];
+Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithPartialPivotingCblas"; "gaussianEliminationWithPartialPivotingC"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

@@ -80,6 +80,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
         // Perform the gaussian elimination
         if (Ab[kRow + kColumn*nRowsA] == 0) {
+            mxDestroyArray(Ab_mxArray);
             mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular", "Matrix is singular.");
         } else {
             // Calculate lower triangular part. This calculates the column of L matrix at the kth column.

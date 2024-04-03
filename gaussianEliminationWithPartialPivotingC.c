@@ -61,8 +61,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
         /* Perform the gaussian elimination */
         if (Ab[k + k*n] == 0) {
-            mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular",
-                              "Matrix is singular.");
+            mxDestroyArray(Ab_mxArray);
+            mexErrMsgIdAndTxt("MATLAB:gaussianEliminationWithPartialPivoting:matrixIsSingular", "Matrix is singular.");
         } else {
             for (i = k+1; i < n; i++) {
                 double lVector = Ab[i + k*n] / Ab[k + k*n]; /* Calculate lower triangular part */

@@ -7,7 +7,7 @@ clear; close all;
 
 %% Simple single matrix test
 rng default;
-n = 800;
+n = 1875;
 A = rand(n);
 % A = rand(n);
 b = rand(n,1);

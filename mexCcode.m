@@ -6,16 +6,14 @@ function mexCcode(debug,verbose)
     verbose (1,1) logical = false;
   end
 
-% the mex calls are different on Windows vs Linux
-FILES_TO_MEX = ["gaussianEliminationWithPartialPivotingC.c";
-    "gaussianEliminationWithPartialPivotingCblas.c"];
-
-mexAPI = "-R2018a";
+MEX_API = "-R2018a";
 
 if ispc
   blasLibrary = "-llibmwblas";
+  lapackLibrary = "-llibmwlapack";
 else
   blasLibrary = "-lmwblas";
+  lapackLibrary = "-lmwlapack";
 end
 
 if debug
@@ -30,8 +28,13 @@ else
   verboseFlag = "";
 end
 
-for i=1:numel(FILES_TO_MEX)
-  mex(FILES_TO_MEX(i),mexAPI,blasLibrary,debugFlag,verboseFlag);
-end
+% gaussianEliminationWithPartialPivotingC.c
+mex("gaussianEliminationWithPartialPivotingC.c", MEX_API, debugFlag, verboseFlag);
+
+% gaussianEliminationWithPartialPivotingCblas.c
+mex("gaussianEliminationWithPartialPivotingCblas.c", MEX_API, blasLibrary, debugFlag, verboseFlag);
+
+% dgesvLAPACK.c
+mex("dgesvLAPACK.c", MEX_API, lapackLibrary, debugFlag, verboseFlag);
 
 end

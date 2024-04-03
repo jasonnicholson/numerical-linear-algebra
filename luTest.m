@@ -16,7 +16,8 @@ tol = 1e-13;
 % Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithRookPivoting"; ...
 %   "gaussianEliminationWithCompletePivoting"; "qrHouseholder"; "qrHouseHolderWithColumnNormPivoting"; "qrHouseHolderWithPartialPivoting";
 %   "gaussianElimination"; "gaussianEliminationWithPartialPivotingC"];
-Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithPartialPivotingCblas"; "gaussianEliminationWithPartialPivotingC"];
+Algorithms = ["\"; "gaussianEliminationWithPartialPivoting"; "gaussianEliminationWithPartialPivotingCblas"; "gaussianEliminationWithPartialPivotingC"; "dgesvLAPACK"];
+% Algorithms = ["\"; "dgesvLAPACK"];
 
 results = table(Algorithms);
 results.Time(1) = timeit(@() A\b,1);

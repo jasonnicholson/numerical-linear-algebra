@@ -13,7 +13,7 @@ FILES_TO_MEX = ["gaussianEliminationWithPartialPivotingC.c";
 mexAPI = "-R2018a";
 
 if ispc
-  blasLibrary = "-libmwblas";
+  blasLibrary = "-llibmwblas";
 else
   blasLibrary = "-lmwblas";
 end

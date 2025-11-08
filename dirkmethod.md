@@ -1,4 +1,6 @@
-1. **Name of the Method**  
+$E=mc^2$
+
+ 1. **Name of the Method**  
    This method does **not** have a widely recognized standard name in the literature. It is a **parameterized second-order diagonally implicit Runge–Kutta (DIRK) method with a rational update derived from a modified (2,2) Padé approximant**.  
    - It belongs to the class of **exponential integrators** or **rational Runge–Kutta methods**.  
    - When $\gamma = \frac{1}{12}$, it recovers the **classical (2,2) Padé-based DIRK method** (sometimes called the **Crouzeix–Raviart method** or **Padé [2,2] DIRK** in the context of exponential or rational integrators).  

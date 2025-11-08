@@ -1,4 +1,3 @@
-$E=mc^2$
 
  1. **Name of the Method**  
    This method does **not** have a widely recognized standard name in the literature. It is a **parameterized second-order diagonally implicit Runge–Kutta (DIRK) method with a rational update derived from a modified (2,2) Padé approximant**.  
@@ -8,15 +7,15 @@ $E=mc^2$
    Thus, a descriptive name is:  
    > **Parameterized (2,2) Padé-DIRK Method with Pole-Tuning Parameter \(\gamma\)**.
 
-2. **Dense Output (Time Interpolant) Between $\(t_n\)$ and \(t_n + h\)**  
+2. **Dense Output (Time Interpolant) Between $\(t_n\)$ and $\(t_n + h\)$**  
    The method supports a **continuous interpolant** of **uniform order 2** using the stage information. Let \(\theta \in [0,1]\), and define the intermediate time \(t = t_n + \theta h\). The interpolant is:
-   \[
+   $$\[
    y(t) = y_n + h \cdot \frac{(6\gamma - 2) k_2(\theta) + (2 - 3\gamma)}{(6\gamma - 1) k_2(\theta) + (1 - 3\gamma)},
-   \]
+   \]$$
    where
-   \[
+   $$\[
    k_2(\theta) = f\!\left(t_n + \tfrac{1}{2}h,\ y_n + \tfrac{1}{2}h k_1\right)
-   \]
+   \]$$
    is **constant** (computed once per step), and the **rational structure** is preserved at every \(\theta\).
 
    **Pseudocode for Interpolant**:

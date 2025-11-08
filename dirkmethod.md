@@ -1,12 +1,12 @@
 1. **Name of the Method**  
    This method does **not** have a widely recognized standard name in the literature. It is a **parameterized second-order diagonally implicit Runge–Kutta (DIRK) method with a rational update derived from a modified (2,2) Padé approximant**.  
    - It belongs to the class of **exponential integrators** or **rational Runge–Kutta methods**.  
-   - When \(\gamma = \frac{1}{12}\), it recovers the **classical (2,2) Padé-based DIRK method** (sometimes called the **Crouzeix–Raviart method** or **Padé [2,2] DIRK** in the context of exponential or rational integrators).  
+   - When \($\gamma = \frac{1}{12}\$), it recovers the **classical (2,2) Padé-based DIRK method** (sometimes called the **Crouzeix–Raviart method** or **Padé [2,2] DIRK** in the context of exponential or rational integrators).  
    - For general \(\gamma\), it is a **one-parameter family of L-stable rational DIRK methods of order 2**, introduced here for **explicit pole control**.  
    Thus, a descriptive name is:  
    > **Parameterized (2,2) Padé-DIRK Method with Pole-Tuning Parameter \(\gamma\)**.
 
-2. **Dense Output (Time Interpolant) Between \(t_n\) and \(t_n + h\)**  
+2. **Dense Output (Time Interpolant) Between $\(t_n\)$ and \(t_n + h\)**  
    The method supports a **continuous interpolant** of **uniform order 2** using the stage information. Let \(\theta \in [0,1]\), and define the intermediate time \(t = t_n + \theta h\). The interpolant is:
    \[
    y(t) = y_n + h \cdot \frac{(6\gamma - 2) k_2(\theta) + (2 - 3\gamma)}{(6\gamma - 1) k_2(\theta) + (1 - 3\gamma)},
